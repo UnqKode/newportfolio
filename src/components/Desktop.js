@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, cloneElement } from "react";
+import { useState, cloneElement } from "react";
 import { AnimatePresence } from "framer-motion";
 import Taskbar from "./Taskbar";
 import StartMenu from "./StartMenu";
@@ -46,11 +46,6 @@ export default function Desktop({ onLock }) {
   const [sortDirection, setSortDirection] = useState(null);
   const [iconSize, setIconSize] = useState('large');
   const [refreshing, setRefreshing] = useState(false);
-  const [fontScale, setFontScale] = useState(1);
-
-  useEffect(() => {
-    document.documentElement.style.zoom = fontScale;
-  }, [fontScale]);
 
   const openWindow = (app) => {
     if (!windows.find(w => w.id === app.id)) {
@@ -109,10 +104,6 @@ export default function Desktop({ onLock }) {
     setContextMenu(null);
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 500);
-  };
-
-  const handleIncreaseFontSize = () => {
-    setFontScale(prev => Math.min(1.5, +(prev + 0.1).toFixed(2)));
   };
 
   return (
@@ -191,13 +182,11 @@ export default function Desktop({ onLock }) {
           <ContextMenu
             x={contextMenu.x}
             y={contextMenu.y}
-            fontScale={fontScale}
             sortDirection={sortDirection}
             iconSize={iconSize}
             onRefresh={handleRefresh}
             onToggleSort={() => { setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc'); setContextMenu(null); }}
             onToggleIconSize={() => { setIconSize(prev => prev === 'large' ? 'small' : 'large'); setContextMenu(null); }}
-            onIncreaseFontSize={() => { handleIncreaseFontSize(); setContextMenu(null); }}
             onPersonalize={() => { setContextMenu(null); setQuickOpen(true); }}
             onAboutPC={() => { setContextMenu(null); openWindow(desktopApps.find(a => a.id === 'about')); }}
             onClose={() => setContextMenu(null)}

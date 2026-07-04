@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { RefreshCw, ArrowDownAZ, ArrowUpZA, LayoutGrid, Grid2x2, Paintbrush, User, ZoomIn } from "lucide-react";
+import { RefreshCw, ArrowDownAZ, ArrowUpZA, LayoutGrid, Grid2x2, Paintbrush, User } from "lucide-react";
 
 function MenuItem({ icon, label, onClick }) {
   return (
@@ -21,7 +21,7 @@ function MenuItem({ icon, label, onClick }) {
   );
 }
 
-export default function ContextMenu({ x, y, sortDirection, iconSize, fontScale, onRefresh, onToggleSort, onToggleIconSize, onIncreaseFontSize, onPersonalize, onAboutPC, onClose }) {
+export default function ContextMenu({ x, y, sortDirection, iconSize, onRefresh, onToggleSort, onToggleIconSize, onPersonalize, onAboutPC, onClose }) {
   const nextSort = sortDirection === "asc" ? "desc" : "asc";
   return (
     <motion.div
@@ -52,11 +52,6 @@ export default function ContextMenu({ x, y, sortDirection, iconSize, fontScale, 
         icon={iconSize === "large" ? <Grid2x2 size={15} /> : <LayoutGrid size={15} />}
         label={iconSize === "large" ? "Small icons" : "Large icons"}
         onClick={onToggleIconSize}
-      />
-      <MenuItem
-        icon={<ZoomIn size={15} />}
-        label={fontScale >= 1.5 ? "Increase text size (max)" : "Increase text size"}
-        onClick={onIncreaseFontSize}
       />
       <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
       <MenuItem
