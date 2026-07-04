@@ -162,6 +162,12 @@ export function RunDialog({ game, onClose, onLaunch }) {
 }
 
 export function GameViewer({ game, onBack, backLabel = "Games" }) {
+  // Built from the actual runtime origin (not a hardcoded domain) so the referrer
+  // GameDistribution sees always matches wherever this is really deployed -
+  // otherwise their player's frame-buster kicks the tab out to gamedistribution.com.
+  const referrer = typeof window !== "undefined" ? `${window.location.origin}/games` : "";
+  const src = `https://html5.gamedistribution.com/${game.gdId}/?gd_sdk_referrer_url=${encodeURIComponent(referrer)}`;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <div
@@ -183,11 +189,12 @@ export function GameViewer({ game, onBack, backLabel = "Games" }) {
         <span style={{ fontSize: 13, fontWeight: 500 }}>{game.title}</span>
       </div>
       <iframe
-        src={game.src}
+        src={src}
         title={game.title}
         loading="lazy"
-        allow="gamepad; fullscreen"
-        style={{ flex: 1, width: "100%", border: "none", background: "black" }}
+        allow="gamepad; fullscreen; autoplay; accelerometer; gyroscope"
+        allowFullScreen
+        style={{ flex: 1, width: "100%", border: "none", background: "black", touchAction: "none" }}
       />
     </div>
   );

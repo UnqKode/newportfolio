@@ -110,7 +110,7 @@ export const projects = [
     tags: ["HTML", "CSS", "JavaScript"],
     iconKey: "globe",
     color: "#6366f1",
-    link: "https://gdsc-jade.vercel.app/",
+    link: "",
   },
   {
     id: 6,

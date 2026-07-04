@@ -14,6 +14,14 @@ export default function ResumeApp() {
   const [status, setStatus] = useState("checking"); // checking | available | missing
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [query, setQuery] = useState("");
+  // Touch-primary devices (tablets/phones) generally can't render a PDF inline via
+  // the browser's native plugin the way desktop Chrome/Edge/Firefox do - the iframe
+  // either shows blank or forces a download instead. Google's viewer renders the
+  // same PDF as an image-based preview that works everywhere, so it's used as the
+  // fallback specifically for coarse-pointer (touch) devices.
+  const [isTouchDevice] = useState(
+    () => typeof window !== "undefined" && (window.matchMedia?.("(pointer: coarse)").matches ?? false)
+  );
   const viewerRef = useRef(null);
 
   useEffect(() => {
@@ -106,7 +114,11 @@ export default function ResumeApp() {
             }}
           >
             <iframe
-              src="/resume.pdf#toolbar=0&navpanes=0"
+              src={
+                isTouchDevice
+                  ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(`${window.location.origin}/resume.pdf`)}`
+                  : "/resume.pdf#toolbar=0&navpanes=0"
+              }
               title="Resume"
               style={{ width: "100%", height: "100%", border: "none", borderRadius: 8, background: "white" }}
             />

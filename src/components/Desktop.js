@@ -19,6 +19,7 @@ import StoreApp from "./apps/StoreApp";
 import TerminalApp from "./apps/TerminalApp";
 import RecycleBinApp from "./apps/RecycleBinApp";
 import GamesApp from "./apps/GamesApp";
+import OldPortfolioApp from "./apps/OldPortfolioApp";
 
 const desktopApps = [
   { id: 'about', title: 'About Me', icon: <img src="/icon-about.svg" alt="" width={32} height={32} />, content: <AboutApp /> },
@@ -29,8 +30,7 @@ const desktopApps = [
   { id: 'terminal', title: 'Terminal', icon: <Terminal size={32} color="#4ec9b0" />, content: <TerminalApp /> },
   { id: 'games', title: 'Games', icon: <img src="/icon-games.svg" alt="" width={32} height={32} />, content: <GamesApp /> },
   { id: 'recycle', title: 'Recycle Bin', icon: <img src="/icon-recyclebin.svg" alt="" width={32} height={32} />, content: <RecycleBinApp /> },
-  // No `content` - this one isn't a window, it navigates away via /old-portfolio (which redirects to the live deployment).
-  { id: 'oldportfolio', title: 'Old Portfolio', icon: <img src="/icon-oldportfolio.svg" alt="" width={32} height={32} />, href: '/old-portfolio' },
+  { id: 'oldportfolio', title: 'Old Portfolio', icon: <img src="/icon-oldportfolio.svg" alt="" width={32} height={32} />, content: <OldPortfolioApp /> },
 ];
 
 const browserApp = { id: 'browser', title: 'Microsoft Edge', icon: <img src="/edge.png" alt="" width={20} height={20} />, content: <BrowserApp /> };
@@ -46,6 +46,7 @@ export default function Desktop({ onLock }) {
   const [sortDirection, setSortDirection] = useState(null);
   const [iconSize, setIconSize] = useState('large');
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedIcon, setSelectedIcon] = useState(null);
 
   const openWindow = (app) => {
     if (!windows.find(w => w.id === app.id)) {
@@ -63,15 +64,6 @@ export default function Desktop({ onLock }) {
     }
 
     setStartOpen(false);
-  };
-
-  const handleAppOpen = (app) => {
-    if (app.href) {
-      window.open(app.href, '_blank', 'noopener,noreferrer');
-      setStartOpen(false);
-      return;
-    }
-    openWindow(app);
   };
 
   const closeWindow = (id) => {
@@ -110,7 +102,7 @@ export default function Desktop({ onLock }) {
     <div
       className="animate-fade-in"
       style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
-      onClick={() => { setStartOpen(false); setQuickOpen(false); setContextMenu(null); }}
+      onClick={() => { setStartOpen(false); setQuickOpen(false); setContextMenu(null); setSelectedIcon(null); }}
       onContextMenu={handleDesktopContextMenu}
     >
       {/* Desktop Icons */}
@@ -121,13 +113,15 @@ export default function Desktop({ onLock }) {
         {orderedApps.map(app => (
           <div
             key={`desktop-${app.id}`}
-            onClick={(e) => { e.stopPropagation(); handleAppOpen(app); }}
+            onClick={(e) => { e.stopPropagation(); setSelectedIcon(app.id); }}
+            onDoubleClick={(e) => { e.stopPropagation(); openWindow(app); }}
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', width: tileWidth,
-              padding: 10, borderRadius: 4, cursor: 'pointer', transition: 'background 0.1s'
+              padding: 10, borderRadius: 4, cursor: 'pointer', transition: 'background 0.1s',
+              background: selectedIcon === app.id ? 'rgba(255,255,255,0.15)' : 'transparent',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            onMouseEnter={(e) => { if (selectedIcon !== app.id) e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+            onMouseLeave={(e) => { if (selectedIcon !== app.id) e.currentTarget.style.background = 'transparent'; }}
           >
             {iconSize === 'large'
               ? app.icon
@@ -164,7 +158,7 @@ export default function Desktop({ onLock }) {
             onClick={(e) => e.stopPropagation()}
             style={{ position: 'fixed', bottom: 60, left: '50%', transform: 'translateX(-50%)', zIndex: 10001 }}
           >
-            <StartMenu apps={desktopApps} onOpen={handleAppOpen} onLock={onLock} />
+            <StartMenu apps={desktopApps} onOpen={openWindow} onLock={onLock} />
           </div>
         )}
       </AnimatePresence>

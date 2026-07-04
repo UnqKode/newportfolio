@@ -1,11 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mic, Coins, GraduationCap, MessagesSquare, Globe, Filter, ShieldCheck, X, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Mic, Coins, GraduationCap, MessagesSquare, Globe, Filter, ShieldCheck, X, CheckCircle2, ArrowLeft, ExternalLink } from "lucide-react";
 import { projects } from "@/data/profile";
 import ExplorerLayout, { SidebarItem, SidebarSection, SidebarSearch, SidebarEmpty } from "../ExplorerLayout";
 
 const INSTALL_STEPS = ["Fetching dependencies", "Compiling", "Linking", "Finishing up"];
+
+// Some project links (e.g. a GitHub repo page) send X-Frame-Options/CSP headers
+// that refuse to be framed at all - embedding those would just show a blank
+// box with no way to detect *why*. Skip the iframe for known unframeable hosts
+// and send visitors straight to a new tab instead.
+const UNFRAMEABLE_HOSTS = ["github.com", "www.github.com"];
+
+function isFrameable(url) {
+  try {
+    return !UNFRAMEABLE_HOSTS.includes(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
 
 const iconMap = {
   mic: Mic,
@@ -73,7 +88,7 @@ function ExeIconSmall({ project }) {
   );
 }
 
-function RunDialog({ project, onClose }) {
+function RunDialog({ project, onClose, onLaunch }) {
   const Icon = iconMap[project.iconKey];
   const [phase, setPhase] = useState("confirm"); // confirm | installing | done
   const [progress, setProgress] = useState(0);
@@ -91,7 +106,7 @@ function RunDialog({ project, onClose }) {
           clearInterval(intervalRef.current);
           setPhase("done");
           setTimeout(() => {
-            window.open(project.link, "_blank", "noopener,noreferrer");
+            onLaunch(project);
             onClose();
           }, 500);
         }
@@ -244,12 +259,135 @@ function RunDialog({ project, onClose }) {
   );
 }
 
+const OFFLINE_TIMEOUT_MS = 9000;
+
+function ProjectViewer({ project, onBack }) {
+  const hasLink = Boolean(project.link);
+  const [loaded, setLoaded] = useState(false);
+  const [offline, setOffline] = useState(!hasLink);
+  const frameable = hasLink && isFrameable(project.link);
+
+  // A dead/unreachable site never fires the iframe's onLoad, so there's no direct
+  // way to detect that failure - a timeout is the standard fallback: if nothing
+  // has loaded after a generous window, assume the site is down rather than
+  // leaving a "Loading..." spinner running forever.
+  useEffect(() => {
+    if (!frameable || loaded) return;
+    const timer = setTimeout(() => setOffline(true), OFFLINE_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [frameable, loaded]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div
+        style={{
+          display: "flex", alignItems: "center", gap: 10, padding: "8px 12px",
+          borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0,
+        }}
+      >
+        <button
+          onClick={onBack}
+          style={{
+            display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.06)",
+            border: "none", borderRadius: 6, padding: "6px 12px", color: "white", fontSize: 12.5, cursor: "pointer",
+          }}
+        >
+          <ArrowLeft size={14} />
+          Projects
+        </button>
+        <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{project.title}</span>
+        {hasLink && (
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.06)",
+              border: "none", borderRadius: 6, padding: "6px 12px", color: "white", fontSize: 12.5, textDecoration: "none",
+            }}
+          >
+            <ExternalLink size={13} />
+            Open in new tab
+          </a>
+        )}
+      </div>
+
+      {!hasLink || (frameable && offline) ? (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14 }}>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", maxWidth: 360, textAlign: "center" }}>
+            The site is not online right now.
+          </p>
+          {hasLink && (
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "9px 18px", borderRadius: 6,
+                background: "var(--win-blue)", color: "white", fontSize: 13, fontWeight: 500, textDecoration: "none",
+              }}
+            >
+              <ExternalLink size={14} />
+              Try in new tab
+            </a>
+          )}
+        </div>
+      ) : frameable ? (
+        <div style={{ flex: 1, position: "relative", background: "white" }}>
+          {!loaded && (
+            <div
+              style={{
+                position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                background: "#1a1a1a", color: "rgba(255,255,255,0.5)", fontSize: 13,
+              }}
+            >
+              Loading {project.title}...
+            </div>
+          )}
+          <iframe
+            src={project.link}
+            title={project.title}
+            loading="lazy"
+            onLoad={() => { setLoaded(true); setOffline(false); }}
+            style={{ width: "100%", height: "100%", border: "none" }}
+          />
+        </div>
+      ) : (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14 }}>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", maxWidth: 360, textAlign: "center" }}>
+            This project links to its source repository, which can&apos;t be previewed inline here.
+          </p>
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "9px 18px", borderRadius: 6,
+              background: "var(--win-blue)", color: "white", fontSize: 13, fontWeight: 500, textDecoration: "none",
+            }}
+          >
+            <ExternalLink size={14} />
+            Open repository
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProjectsApp() {
   const [selected, setSelected] = useState(null);
   const [running, setRunning] = useState(null);
+  const [activeProject, setActiveProject] = useState(null);
   const [query, setQuery] = useState("");
 
   const filteredProjects = projects.filter((p) => p.exeName.toLowerCase().includes(query.toLowerCase()));
+
+  if (activeProject) {
+    return <ProjectViewer project={activeProject} onBack={() => setActiveProject(null)} />;
+  }
 
   return (
     <div style={{ position: "relative", height: "100%" }}>
@@ -286,9 +424,12 @@ export default function ProjectsApp() {
               gap: 20,
             }}
           >
-            {projects.map((project) => (
-              <div
+            {projects.map((project, index) => (
+              <motion.div
                 key={project.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.24, delay: index * 0.03, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(e) => { e.stopPropagation(); setSelected(project.id); }}
                 onDoubleClick={(e) => { e.stopPropagation(); setRunning(project); }}
                 style={{
@@ -300,13 +441,19 @@ export default function ProjectsApp() {
               >
                 <ExeIcon project={project} />
                 <span style={{ fontSize: 12, wordBreak: "break-word" }}>{project.exeName}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </ExplorerLayout>
 
-      {running && <RunDialog project={running} onClose={() => setRunning(null)} />}
+      {running && (
+        <RunDialog
+          project={running}
+          onClose={() => setRunning(null)}
+          onLaunch={(project) => { setRunning(null); setActiveProject(project); }}
+        />
+      )}
     </div>
   );
 }

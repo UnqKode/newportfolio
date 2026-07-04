@@ -1,6 +1,9 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { motion } from "framer-motion";
+
+const POP_TRANSITION = { duration: 0.24, ease: [0.16, 1, 0.3, 1] };
 
 export function SidebarSearch({ value, onChange, placeholder = "Find a setting" }) {
   return (
@@ -48,7 +51,10 @@ export function SidebarSection({ label }) {
 
 export function SidebarItem({ icon, label, active, disabled, onClick }) {
   return (
-    <button
+    <motion.button
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={POP_TRANSITION}
       className={`sp-nav-item${active ? " active" : ""}`}
       onClick={disabled ? undefined : onClick}
       style={{
@@ -64,7 +70,7 @@ export function SidebarItem({ icon, label, active, disabled, onClick }) {
     >
       {icon}
       {label}
-    </button>
+    </motion.button>
   );
 }
 
@@ -93,9 +99,14 @@ export default function ExplorerLayout({ breadcrumb, sidebar, children }) {
             {breadcrumb}
           </div>
         )}
-        <div style={{ flex: 1, overflow: "auto", padding: 20 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          style={{ flex: 1, overflow: "auto", padding: 20 }}
+        >
           {children}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

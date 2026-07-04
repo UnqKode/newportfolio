@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { games } from "@/data/games";
 import ExplorerLayout, { SidebarItem, SidebarSection, SidebarSearch, SidebarEmpty } from "../ExplorerLayout";
 import { ExeIcon, ExeIconSmall, RunDialog, GameViewer } from "../games/GameLauncher";
@@ -49,9 +50,12 @@ export default function GamesApp() {
             {games.length} items - double-click a game to run it
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, 96px)", gap: 20 }}>
-            {games.map((game) => (
-              <div
+            {games.map((game, index) => (
+              <motion.div
                 key={game.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.24, delay: index * 0.025, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(e) => { e.stopPropagation(); setSelected(game.id); }}
                 onDoubleClick={(e) => { e.stopPropagation(); setLaunching(game); }}
                 style={{
@@ -63,7 +67,7 @@ export default function GamesApp() {
               >
                 <ExeIcon game={game} />
                 <span style={{ fontSize: 12, wordBreak: "break-word" }}>{game.exeName}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

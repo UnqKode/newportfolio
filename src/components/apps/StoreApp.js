@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Home, Library } from "lucide-react";
 import { GithubIcon } from "../icons/BrandIcons";
 import { games } from "@/data/games";
@@ -95,9 +96,12 @@ export default function StoreApp() {
               {games.length} games installed - double-click one to play
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, 96px)", gap: 20 }}>
-              {games.map((game) => (
-                <div
+              {games.map((game, index) => (
+                <motion.div
                   key={game.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.24, delay: index * 0.025, ease: [0.16, 1, 0.3, 1] }}
                   onClick={(e) => { e.stopPropagation(); setSelected(game.id); }}
                   onDoubleClick={(e) => { e.stopPropagation(); setLaunching(game); }}
                   style={{
@@ -109,7 +113,7 @@ export default function StoreApp() {
                 >
                   <ExeIcon game={game} />
                   <span style={{ fontSize: 12, wordBreak: "break-word" }}>{game.title}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
