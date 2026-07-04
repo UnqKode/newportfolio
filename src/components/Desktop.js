@@ -21,6 +21,9 @@ import RecycleBinApp from "./apps/RecycleBinApp";
 import GamesApp from "./apps/GamesApp";
 import OldPortfolioApp from "./apps/OldPortfolioApp";
 
+const browserApp = { id: 'browser', title: 'Microsoft Edge', icon: <img src="/edge.png" alt="" width={32} height={32} />, content: <BrowserApp /> };
+const storeApp = { id: 'store', title: 'Microsoft Store', icon: <img src="/microsoftstore.png" alt="" width={32} height={32} />, content: <StoreApp /> };
+
 const desktopApps = [
   { id: 'about', title: 'About Me', icon: <img src="/icon-about.svg" alt="" width={32} height={32} />, content: <AboutApp /> },
   { id: 'projects', title: 'Projects', icon: <img src="/icon-projects.svg" alt="" width={32} height={32} />, content: <ProjectsApp /> },
@@ -29,12 +32,11 @@ const desktopApps = [
   { id: 'resume', title: 'Resume', icon: <img src="/icon-resume.svg" alt="" width={32} height={32} />, content: <ResumeApp /> },
   { id: 'terminal', title: 'Terminal', icon: <Terminal size={32} color="#4ec9b0" />, content: <TerminalApp /> },
   { id: 'games', title: 'Games', icon: <img src="/icon-games.svg" alt="" width={32} height={32} />, content: <GamesApp /> },
+  browserApp,
+  storeApp,
   { id: 'recycle', title: 'Recycle Bin', icon: <img src="/icon-recyclebin.svg" alt="" width={32} height={32} />, content: <RecycleBinApp /> },
   { id: 'oldportfolio', title: 'Old Portfolio', icon: <img src="/icon-oldportfolio.svg" alt="" width={32} height={32} />, content: <OldPortfolioApp /> },
 ];
-
-const browserApp = { id: 'browser', title: 'Microsoft Edge', icon: <img src="/edge.png" alt="" width={20} height={20} />, content: <BrowserApp /> };
-const storeApp = { id: 'store', title: 'Microsoft Store', icon: <img src="/microsoftstore.png" alt="" width={20} height={20} />, content: <StoreApp /> };
 
 export default function Desktop({ onLock }) {
   const [startOpen, setStartOpen] = useState(false);

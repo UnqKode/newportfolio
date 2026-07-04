@@ -145,11 +145,11 @@ export const skillGroups = [
   },
   {
     group: "Databases",
-    items: ["MongoDB", "MySQL", "PostgreSQL (schema design, indexing, normalization)"],
+    items: ["MongoDB", "MySQL", "PostgreSQL"],
   },
   {
     group: "Cloud & DevOps",
-    items: ["Firebase Hosting", "Vercel", "Cloudinary", "CI/CD basics", "Containerization (Docker - basics)"],
+    items: ["Firebase Hosting", "Vercel", "Cloudinary", "CI/CD basics"],
   },
   {
     group: "Testing & Quality",
