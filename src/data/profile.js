@@ -1,7 +1,7 @@
 export const profile = {
   name: "Manas Yadav",
   handle: "MaYa",
-  tagline: "Web Developer • Creative Coder • Spider-Fan",
+  tagline: "Web Developer • Creative Coder",
   email: "mycodeunq@gmail.com",
   gmailComposeUrl:
     "https://mail.google.com/mail/u/0/?view=cm&fs=1&to=mycodeunq@gmail.com",

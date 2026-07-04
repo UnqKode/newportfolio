@@ -21,7 +21,6 @@ const NAV_ITEMS = [
 ];
 
 const interests = [
-  { id: "spider", emoji: "🕷️", label: "Spider-Fan", accent: "#dc2626", description: "Big fan of the wall-crawler - it shows in the little details." },
   { id: "creative", emoji: "🎨", label: "Creative Coding", accent: "#a855f7", description: "Blending design and code into interfaces that feel alive." },
   { id: "motion", emoji: "🎬", label: "Motion & Animation", accent: "#0891b2", description: "Obsessed with the small transitions that make software feel good." },
   { id: "freelance", emoji: "🤝", label: "Freelance Collab", accent: "#16a34a", description: "Open to freelance work and collaborations - jump to Connect.", action: "connect" },

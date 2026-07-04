@@ -162,11 +162,20 @@ export function RunDialog({ game, onClose, onLaunch }) {
 }
 
 export function GameViewer({ game, onBack, backLabel = "Games" }) {
-  // Built from the actual runtime origin (not a hardcoded domain) so the referrer
-  // GameDistribution sees always matches wherever this is really deployed -
-  // otherwise their player's frame-buster kicks the tab out to gamedistribution.com.
+  // IMPORTANT: embed through embed.gamedistribution.com, NOT html5.gamedistribution.com
+  // directly. The game document served from html5.* has an anti-clickjacking frame-buster
+  // that inspects its immediate parent frame; when that parent is our own site (localhost,
+  // *.vercel.app, custom domain) it treats the embed as hotlinked and does
+  // `window.top.location = <canonical game page>`, kicking the whole tab out to
+  // gamedistribution.com. The official embed wrapper loads the game in a nested iframe on
+  // GameDistribution's own origin, so the buster sees a trusted parent and never fires. It
+  // also normalizes the referrer (e.g. localhost -> gamedistribution.com) for us.
   const referrer = typeof window !== "undefined" ? `${window.location.origin}/games` : "";
-  const src = `https://html5.gamedistribution.com/${game.gdId}/?gd_sdk_referrer_url=${encodeURIComponent(referrer)}`;
+  const gameUrl = `https://html5.gamedistribution.com/${game.gdId}/`;
+  const src =
+    `https://embed.gamedistribution.com/?url=${encodeURIComponent(gameUrl)}` +
+    `&gd_sdk_referrer_url=${encodeURIComponent(referrer)}` +
+    `&gdpr-tracking=1&gdpr-targeting=1`;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>

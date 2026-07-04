@@ -76,7 +76,7 @@ const HACK_LINES = [
   "Cracking mainframe encryption... [OK]",
   "Downloading more RAM... [OK]",
   "Access granted.",
-  "Just kidding - but nice try. 🕷️",
+  "Just kidding - but nice try. 😄",
 ];
 
 export default function TerminalApp() {
