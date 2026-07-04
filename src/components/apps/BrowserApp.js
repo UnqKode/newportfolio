@@ -21,6 +21,7 @@ const shortcuts = [
 export default function BrowserApp() {
   const [query, setQuery] = useState("");
   const [addressQuery, setAddressQuery] = useState("");
+  const [history, setHistory] = useState([]);
   const openLink = (url) => window.open(url, "_blank", "noopener,noreferrer");
 
   const handleAddressKeyDown = (e) => {
@@ -28,6 +29,8 @@ export default function BrowserApp() {
     const term = addressQuery.trim();
     if (!term) return;
     openLink(`https://www.google.com/search?q=${encodeURIComponent(term)}`);
+    setHistory((prev) => [term, ...prev.filter((h) => h !== term)].slice(0, 10));
+    setAddressQuery("");
   };
 
   const filteredShortcuts = shortcuts.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
@@ -62,7 +65,18 @@ export default function BrowserApp() {
               {showHistory && (
                 <>
                   <SidebarSection label="History" />
-                  <SidebarItem icon={<History size={15} />} label="Empty - it's a new browser" disabled />
+                  {history.length === 0 ? (
+                    <SidebarItem icon={<History size={15} />} label="Empty - it's a new browser" disabled />
+                  ) : (
+                    history.map((term) => (
+                      <SidebarItem
+                        key={term}
+                        icon={<History size={15} />}
+                        label={term}
+                        onClick={() => openLink(`https://www.google.com/search?q=${encodeURIComponent(term)}`)}
+                      />
+                    ))
+                  )}
                 </>
               )}
             </>
