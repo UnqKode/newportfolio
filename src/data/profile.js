@@ -94,7 +94,7 @@ export const projects = [
     tags: ["React", "Socket.io", "Express", "MongoDB", "Node.js"],
     iconKey: "chat",
     color: "#0078d4",
-    link: "https://chat-io-9xh6.onrender.com/",
+    link: "https://chat-app-chi-one-55.vercel.app/",
   },
   {
     id: 5,
